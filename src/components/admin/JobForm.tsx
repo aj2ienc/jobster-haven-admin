@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { Job, JobType } from "@/types/job";
 import { z } from "zod";
@@ -7,8 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -31,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 interface JobFormProps {
   job?: Job;
   onSubmit: (data: any) => void;
+  form?: ReturnType<typeof useForm<any>>;
 }
 
 const jobFormSchema = z.object({
@@ -55,10 +53,11 @@ const jobFormSchema = z.object({
   featured: z.boolean().default(false),
 });
 
-const JobForm: React.FC<JobFormProps> = ({ job, onSubmit }) => {
+const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) => {
   const { toast } = useToast();
   
-  const form = useForm<z.infer<typeof jobFormSchema>>({
+  // Use the external form if provided, otherwise create a new one
+  const form = externalForm || useForm<z.infer<typeof jobFormSchema>>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: job ? {
       ...job,

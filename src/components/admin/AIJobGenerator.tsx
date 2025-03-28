@@ -5,12 +5,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Job, JobType } from "@/types/job";
+import { useForm } from "react-hook-form";
 
 interface AIJobGeneratorProps {
   onJobGenerated: (jobData: any) => void;
+  form: ReturnType<typeof useForm<any>>;
 }
 
-const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated }) => {
+const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form }) => {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -32,11 +35,35 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated }) => {
       setTimeout(() => {
         // Mock response simulating an AI-generated job
         const mockResponse = parseJobDescription(prompt);
+        
+        // Populate the form fields with the generated data
+        form.setValue("title", mockResponse.title);
+        form.setValue("company", mockResponse.company);
+        form.setValue("logo", "");
+        form.setValue("type", mockResponse.type);
+        form.setValue("location.city", mockResponse.location.city);
+        form.setValue("location.state", mockResponse.location.state || "");
+        form.setValue("location.country", mockResponse.location.country);
+        form.setValue("location.remote", mockResponse.location.remote);
+        form.setValue("salary.min", mockResponse.salary.min);
+        form.setValue("salary.max", mockResponse.salary.max);
+        form.setValue("salary.currency", mockResponse.salary.currency);
+        form.setValue("description", mockResponse.description);
+        
+        // Set requirements - ensure we have at least one
+        if (mockResponse.requirements.length > 0) {
+          form.setValue("requirements", mockResponse.requirements);
+        }
+        
+        form.setValue("applicationUrl", "");
+        form.setValue("featured", false);
+        
+        // Also pass the data to the parent component for any additional handling
         onJobGenerated(mockResponse);
         
         toast({
-          title: "Job generated",
-          description: "Job details have been populated from your description",
+          title: "Job details generated",
+          description: "All form fields have been populated from your description",
         });
         
         setIsGenerating(false);
@@ -65,10 +92,10 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated }) => {
     if (text.toLowerCase().includes("market")) title = "Marketing Specialist";
     
     // Extract job type
-    let type = "Full-time"; // Default
+    let type = "Full-time" as JobType; // Default
     for (const jobType of jobTypes) {
       if (text.toLowerCase().includes(jobType.toLowerCase())) {
-        type = jobType;
+        type = jobType as JobType;
         break;
       }
     }
