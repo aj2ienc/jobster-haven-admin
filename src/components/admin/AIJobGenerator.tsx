@@ -81,12 +81,16 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated }) => {
       // Convert first two matches to numbers
       const salaries = salaryMatches
         .slice(0, 2)
-        .map(s => parseInt(s.replace(/\$|k|,/g, '')));
+        .map(salary => {
+          // Check if the salary string includes 'k' to multiply by 1000
+          const multiplier = salary.includes('k') ? 1000 : 1;
+          return parseInt(salary.replace(/\$|k|,/g, '')) * multiplier;
+        });
       
       // Use as min/max if they're valid numbers
       if (!isNaN(salaries[0]) && !isNaN(salaries[1])) {
-        salaryMin = Math.min(salaries[0], salaries[1]) * (s.includes('k') ? 1000 : 1);
-        salaryMax = Math.max(salaries[0], salaries[1]) * (s.includes('k') ? 1000 : 1);
+        salaryMin = Math.min(salaries[0], salaries[1]);
+        salaryMax = Math.max(salaries[0], salaries[1]);
       }
     }
     
