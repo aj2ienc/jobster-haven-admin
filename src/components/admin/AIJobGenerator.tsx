@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Job, JobType } from "@/types/job";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { JobFormValues } from "./JobForm";
 
 interface AIJobGeneratorProps {
   onJobGenerated: (jobData: any) => void;
-  form: ReturnType<typeof useForm<any>>;
+  form: UseFormReturn<JobFormValues>;
 }
 
 const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form }) => {

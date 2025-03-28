@@ -1,5 +1,6 @@
+
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { Job, JobType } from "@/types/job";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,13 +26,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 
-interface JobFormProps {
-  job?: Job;
-  onSubmit: (data: any) => void;
-  form?: ReturnType<typeof useForm<any>>;
-}
-
-const jobFormSchema = z.object({
+// Define the form schema type for better type safety
+export const jobFormSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
   company: z.string().min(2, { message: "Company name is required" }),
   logo: z.string().optional(),
@@ -53,11 +49,20 @@ const jobFormSchema = z.object({
   featured: z.boolean().default(false),
 });
 
+// Define the type for the form data
+export type JobFormValues = z.infer<typeof jobFormSchema>;
+
+interface JobFormProps {
+  job?: Job;
+  onSubmit: (data: any) => void;
+  form?: UseFormReturn<JobFormValues>;
+}
+
 const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) => {
   const { toast } = useToast();
   
   // Use the external form if provided, otherwise create a new one
-  const form = externalForm || useForm<z.infer<typeof jobFormSchema>>({
+  const form = externalForm || useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: job ? {
       ...job,
@@ -85,7 +90,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) 
     },
   });
 
-  const handleFormSubmit = (data: z.infer<typeof jobFormSchema>) => {
+  const handleFormSubmit = (data: JobFormValues) => {
     // Remove empty requirements
     data.requirements = data.requirements.filter(req => req.trim() !== "");
     
@@ -102,12 +107,12 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) 
   };
 
   const addRequirement = () => {
-    const currentRequirements = form.getValues().requirements;
+    const currentRequirements = form.getValues("requirements");
     form.setValue("requirements", [...currentRequirements, ""]);
   };
 
   const removeRequirement = (index: number) => {
-    const currentRequirements = form.getValues().requirements;
+    const currentRequirements = form.getValues("requirements");
     currentRequirements.splice(index, 1);
     form.setValue("requirements", [...currentRequirements]);
   };

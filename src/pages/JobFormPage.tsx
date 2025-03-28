@@ -5,12 +5,11 @@ import { useJobs } from "@/context/JobContext";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import JobForm from "@/components/admin/JobForm";
+import JobForm, { jobFormSchema, JobFormValues } from "@/components/admin/JobForm";
 import AIJobGenerator from "@/components/admin/AIJobGenerator";
 import { Job } from "@/types/job";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 const JobFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,34 +19,9 @@ const JobFormPage: React.FC = () => {
   const isEditing = Boolean(id);
 
   // Create a form instance to share with both JobForm and AIJobGenerator
-  const jobFormSchema = z.object({
-    title: z.string().min(3, { message: "Title must be at least 3 characters" }),
-    company: z.string().min(2, { message: "Company name is required" }),
-    logo: z.string().optional(),
-    location: z.object({
-      city: z.string(),
-      state: z.string().optional(),
-      country: z.string(),
-      remote: z.boolean().default(false),
-    }),
-    type: z.enum(["Full-time", "Part-time", "Contract", "Freelance", "Internship"]),
-    description: z.string().min(10, { message: "Description must be at least 10 characters" }),
-    requirements: z.array(z.string()),
-    salary: z.object({
-      min: z.number().min(0),
-      max: z.number().min(0),
-      currency: z.string(),
-    }).optional(),
-    applicationUrl: z.string().url().optional(),
-    featured: z.boolean().default(false),
-  });
-
-  const form = useForm<z.infer<typeof jobFormSchema>>({
+  const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
-    defaultValues: job ? {
-      ...job,
-      requirements: job.requirements || [""],
-    } : {
+    defaultValues: {
       title: "",
       company: "",
       logo: "",
@@ -87,11 +61,17 @@ const JobFormPage: React.FC = () => {
     }
   }, [id, getJob, navigate, form]);
 
-  const handleSubmit = (data: Job) => {
+  const handleSubmit = (data: JobFormValues) => {
+    const jobData = {
+      ...data,
+      id: id || Date.now().toString(),
+      postedAt: job?.postedAt || new Date().toISOString(),
+    };
+    
     if (isEditing) {
-      updateJob(data);
+      updateJob(jobData);
     } else {
-      addJob(data);
+      addJob(jobData);
     }
     navigate("/admin");
   };
