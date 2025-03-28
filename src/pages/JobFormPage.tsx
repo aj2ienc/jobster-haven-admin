@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import JobForm from "@/components/admin/JobForm";
+import AIJobGenerator from "@/components/admin/AIJobGenerator";
 import { Job } from "@/types/job";
 
 const JobFormPage: React.FC = () => {
@@ -35,6 +36,16 @@ const JobFormPage: React.FC = () => {
     navigate("/admin");
   };
 
+  const handleJobGenerated = (generatedJob: any) => {
+    setJob(prevJob => ({
+      ...prevJob,
+      ...generatedJob,
+      id: prevJob?.id || Date.now().toString(),
+      postedAt: prevJob?.postedAt || new Date().toISOString(),
+      featured: prevJob?.featured || false,
+    }));
+  };
+
   return (
     <div>
       <Button
@@ -45,6 +56,10 @@ const JobFormPage: React.FC = () => {
         <ArrowLeft className="h-4 w-4" />
         <span>Back to dashboard</span>
       </Button>
+
+      {!isEditing && (
+        <AIJobGenerator onJobGenerated={handleJobGenerated} />
+      )}
 
       <Card>
         <CardHeader>

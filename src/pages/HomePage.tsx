@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setFilter({ searchTerm });
-    navigate("/");
+    navigate("/jobs");
   };
 
   return (
