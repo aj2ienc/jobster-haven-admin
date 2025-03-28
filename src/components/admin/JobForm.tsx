@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { Job, JobType } from "@/types/job";
@@ -30,10 +29,10 @@ import { useToast } from "@/hooks/use-toast";
 export const jobFormSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
   company: z.string().min(2, { message: "Company name is required" }),
-  logo: z.string().optional(),
+  logo: z.string().optional().default(""),
   location: z.object({
     city: z.string(),
-    state: z.string().optional(),
+    state: z.string().optional().default(""),
     country: z.string(),
     remote: z.boolean().default(false),
   }),
@@ -44,8 +43,8 @@ export const jobFormSchema = z.object({
     min: z.number().min(0),
     max: z.number().min(0),
     currency: z.string(),
-  }).optional(),
-  applicationUrl: z.string().url().optional(),
+  }),
+  applicationUrl: z.string().url().optional().default(""),
   featured: z.boolean().default(false),
 });
 
@@ -54,51 +53,18 @@ export type JobFormValues = z.infer<typeof jobFormSchema>;
 
 interface JobFormProps {
   job?: Job;
-  onSubmit: (data: any) => void;
-  form?: UseFormReturn<JobFormValues>;
+  onSubmit: (data: JobFormValues) => void;
+  form: UseFormReturn<JobFormValues>;
 }
 
-const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) => {
+const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form }) => {
   const { toast } = useToast();
-  
-  // Use the external form if provided, otherwise create a new one
-  const form = externalForm || useForm<JobFormValues>({
-    resolver: zodResolver(jobFormSchema),
-    defaultValues: job ? {
-      ...job,
-      requirements: job.requirements || [""],
-    } : {
-      title: "",
-      company: "",
-      logo: "",
-      location: {
-        city: "",
-        state: "",
-        country: "",
-        remote: false,
-      },
-      type: "Full-time",
-      description: "",
-      requirements: [""],
-      salary: {
-        min: 0,
-        max: 0,
-        currency: "USD",
-      },
-      applicationUrl: "",
-      featured: false,
-    },
-  });
 
   const handleFormSubmit = (data: JobFormValues) => {
     // Remove empty requirements
     data.requirements = data.requirements.filter(req => req.trim() !== "");
     
-    onSubmit({
-      ...data,
-      postedAt: job?.postedAt || new Date().toISOString(),
-      id: job?.id || Date.now().toString(),
-    });
+    onSubmit(data);
     
     toast({
       title: job ? "Job updated" : "Job created",
@@ -107,12 +73,12 @@ const JobForm: React.FC<JobFormProps> = ({ job, onSubmit, form: externalForm }) 
   };
 
   const addRequirement = () => {
-    const currentRequirements = form.getValues("requirements");
+    const currentRequirements = form.watch("requirements");
     form.setValue("requirements", [...currentRequirements, ""]);
   };
 
   const removeRequirement = (index: number) => {
-    const currentRequirements = form.getValues("requirements");
+    const currentRequirements = form.watch("requirements");
     currentRequirements.splice(index, 1);
     form.setValue("requirements", [...currentRequirements]);
   };

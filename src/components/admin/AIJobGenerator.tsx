@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Job, JobType } from "@/types/job";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { JobFormValues } from "./JobForm";
 
 interface AIJobGeneratorProps {
-  onJobGenerated: (jobData: any) => void;
+  onJobGenerated: (jobData: Partial<Job>) => void;
   form: UseFormReturn<JobFormValues>;
 }
 
@@ -40,7 +40,7 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form })
         // Populate the form fields with the generated data
         form.setValue("title", mockResponse.title);
         form.setValue("company", mockResponse.company);
-        form.setValue("logo", "");
+        form.setValue("logo", mockResponse.logo || "");
         form.setValue("type", mockResponse.type);
         form.setValue("location.city", mockResponse.location.city);
         form.setValue("location.state", mockResponse.location.state || "");
@@ -56,7 +56,7 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form })
           form.setValue("requirements", mockResponse.requirements);
         }
         
-        form.setValue("applicationUrl", "");
+        form.setValue("applicationUrl", mockResponse.applicationUrl || "");
         form.setValue("featured", false);
         
         // Also pass the data to the parent component for any additional handling
@@ -80,7 +80,7 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form })
   };
 
   // Parse job description from natural language
-  const parseJobDescription = (text: string) => {
+  const parseJobDescription = (text: string): Job => {
     // This is a simple mock implementation
     // In a real app, this would use a proper AI model
     const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance", "Internship"];
@@ -139,6 +139,7 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form })
     };
     
     return {
+      id: Date.now().toString(),
       title,
       company: "TechCorp",
       type,
@@ -150,6 +151,10 @@ const AIJobGenerator: React.FC<AIJobGeneratorProps> = ({ onJobGenerated, form })
         max: salaryMax,
         currency: "USD"
       },
+      postedAt: new Date().toISOString(),
+      applicationUrl: "",
+      featured: false,
+      logo: "",
     };
   };
 

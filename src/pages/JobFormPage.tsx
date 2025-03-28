@@ -62,10 +62,25 @@ const JobFormPage: React.FC = () => {
   }, [id, getJob, navigate, form]);
 
   const handleSubmit = (data: JobFormValues) => {
-    const jobData = {
-      ...data,
+    // Create job data with all required fields as non-optional
+    const jobData: Job = {
       id: id || Date.now().toString(),
+      title: data.title,
+      company: data.company,
+      logo: data.logo || "",
+      location: {
+        city: data.location.city,
+        state: data.location.state || "",
+        country: data.location.country,
+        remote: data.location.remote || false,
+      },
+      type: data.type,
+      description: data.description,
+      requirements: data.requirements.filter(req => req.trim() !== "") || [],
+      salary: data.salary,
       postedAt: job?.postedAt || new Date().toISOString(),
+      applicationUrl: data.applicationUrl || "",
+      featured: data.featured || false,
     };
     
     if (isEditing) {
