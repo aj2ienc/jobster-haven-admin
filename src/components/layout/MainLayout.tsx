@@ -28,7 +28,21 @@ const MainLayout: React.FC = () => {
             >
               <Link to="/">
                 <Briefcase className="h-4 w-4" />
-                <span>Jobs</span>
+                <span>Home</span>
+              </Link>
+            </Button>
+            
+            <Button 
+              variant={location.pathname === "/jobs" ? "default" : "ghost"} 
+              asChild
+              className={cn(
+                "gap-2",
+                location.pathname === "/jobs" ? "bg-jobs-blue hover:bg-jobs-blue/90" : ""
+              )}
+            >
+              <Link to="/jobs">
+                <Briefcase className="h-4 w-4" />
+                <span>Browse Jobs</span>
               </Link>
             </Button>
             

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { JobProvider } from "@/context/JobContext";
 import MainLayout from "@/components/layout/MainLayout";
+import HomePage from "./pages/HomePage";
 import JobsPage from "./pages/JobsPage";
 import JobDetailPage from "./pages/JobDetailPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -23,7 +24,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route element={<MainLayout />}>
-              <Route path="/" element={<JobsPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/jobs" element={<JobsPage />} />
               <Route path="/jobs/:id" element={<JobDetailPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/jobs/new" element={<JobFormPage />} />
