@@ -1,7 +1,10 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 
-const NotFound = () => {
+import React, { useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Briefcase } from "lucide-react";
+
+const NotFound: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
@@ -12,13 +15,22 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <div className="min-h-[80vh] flex flex-col items-center justify-center py-12">
+      <Briefcase className="w-16 h-16 text-jobs-blue mb-4" />
+      
+      <h1 className="text-4xl font-bold text-jobs-navy mb-2">404</h1>
+      <p className="text-xl text-jobs-gray mb-8">
+        Oops! We couldn't find the page you're looking for.
+      </p>
+      
+      <div className="flex gap-4">
+        <Button asChild className="bg-jobs-blue hover:bg-jobs-blue/90">
+          <Link to="/">Browse Jobs</Link>
+        </Button>
+        
+        <Button asChild variant="outline">
+          <Link to="/admin">Go to Admin</Link>
+        </Button>
       </div>
     </div>
   );
